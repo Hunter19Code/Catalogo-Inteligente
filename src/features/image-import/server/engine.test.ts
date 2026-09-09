@@ -102,19 +102,22 @@ describe('motor Gemini', () => {
   })
 
   it('valida el JSON del proveedor antes de devolverlo', async () => {
-    const fetchMock = vi.fn(async () =>
-      new Response(JSON.stringify(validProviderResponse()), { status: 200 }),
-    )
+    let capturedRequest: RequestInit | undefined
+    const fetchMock: typeof fetch = async (_input, request) => {
+      capturedRequest = request
+      return new Response(JSON.stringify(validProviderResponse()), {
+        status: 200,
+      })
+    }
 
     const result = await analyzePreparedImages([preparedImage()], {
       apiKey: 'server-secret',
-      fetchImplementation: fetchMock as typeof fetch,
+      fetchImplementation: fetchMock,
       timeoutMs: 1_000,
     })
 
     expect(result.document.kind).toBe('not_a_list')
-    const [, request] = fetchMock.mock.calls[0]
-    expect(request?.headers).toMatchObject({
+    expect(capturedRequest?.headers).toMatchObject({
       'x-goog-api-key': 'server-secret',
     })
   })
