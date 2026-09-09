@@ -135,6 +135,18 @@ describe('normalización conservadora', () => {
     expect(product.confidence.reasons).toContain('ambiguous_name')
   })
 
+  it('conserva mayúsculas internas y normaliza texto completamente en mayúsculas', () => {
+    const [brand] = normalizeAIAnalysis(
+      example({ original: 'coca cola', proposed: 'Coca-Cola' }),
+    )
+    const [uppercase] = normalizeAIAnalysis(
+      example({ original: 'LECHE ENTERA', proposed: 'LECHE ENTERA' }),
+    )
+
+    expect(brand.normalized.name).toBe('Coca-Cola')
+    expect(uppercase.normalized.name).toBe('Leche entera')
+  })
+
   it('conserva cantidades y unidades explícitas sin crear valores por defecto', () => {
     const [withQuantity] = normalizeAIAnalysis(
       example({

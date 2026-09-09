@@ -93,9 +93,13 @@ export function semanticEvidenceScore(originalText: string, name: string) {
 function titleCaseFirst(value: string) {
   const normalized = value.trim().replace(/\s+/g, ' ')
   if (!normalized) return normalized
+  const casingPreserved =
+    normalized === normalized.toLocaleUpperCase('es')
+      ? normalized.toLocaleLowerCase('es')
+      : normalized
   return (
-    normalized.charAt(0).toLocaleUpperCase('es') +
-    normalized.slice(1).toLocaleLowerCase('es')
+    casingPreserved.charAt(0).toLocaleUpperCase('es') +
+    casingPreserved.slice(1)
   )
 }
 
