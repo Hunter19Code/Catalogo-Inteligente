@@ -1,0 +1,4 @@
+project_id = "favoritos"
+
+[functions.analyze-shopping-image]
+verify_jwt = true

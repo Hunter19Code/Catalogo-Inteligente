@@ -336,6 +336,13 @@ export const ReviewedShoppingListItemSchema = z
   .strict()
 
 export const AI_IMAGE_ANALYSIS_SCHEMA_VERSION = '1.0' as const
+export const AI_IMAGE_ANALYSIS_JSON_SCHEMA = z.toJSONSchema(
+  AIImageAnalysisResponseSchema,
+  {
+    target: 'draft-2020-12',
+    unrepresentable: 'any',
+  },
+)
 
 export type CanonicalUnit = z.infer<typeof CanonicalUnitSchema>
 export type SourceEvidence = z.infer<typeof SourceEvidenceSchema>

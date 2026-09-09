@@ -1,4 +1,5 @@
 export {
+  AI_IMAGE_ANALYSIS_JSON_SCHEMA,
   AI_IMAGE_ANALYSIS_SCHEMA_VERSION,
   AIImageAnalysisResponseSchema,
   AIImageItemSchema,
