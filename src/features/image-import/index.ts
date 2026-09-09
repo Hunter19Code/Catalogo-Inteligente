@@ -22,6 +22,11 @@ export {
   parseNormalizedDetectedProduct,
   parseReviewedShoppingListItem,
 } from './validation'
+export {
+  literalProductName,
+  normalizeAIAnalysis,
+  semanticEvidenceScore,
+} from './interpretation'
 export type {
   AIAnalysisValidationContext,
   ContractValidationIssue,

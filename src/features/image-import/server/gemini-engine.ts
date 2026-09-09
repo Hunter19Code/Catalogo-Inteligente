@@ -56,6 +56,16 @@ REGLAS OBLIGATORIAS:
 - Si no puede leerse con fiabilidad, devuelve kind=unreadable e items=[].
 - No generes explicaciones, Markdown ni propiedades fuera del esquema.
 
+EJEMPLOS DE INTERPRETACIÓN:
+- "2 leche" → name="Leche", quantity.value=2, unit=null.
+- "6 yog nat" → name="Yogur natural", expanded_abbreviation.
+- "tom 1kg" → name="Tomate", value=1, unit="kg".
+- "3 lat atun" → name="Atún", value=3, unit="lata".
+- "2x coca cola" → name="Coca-Cola", value=2, unit=null.
+- "lech3" → name="Leche", corrected_ocr.
+- "pollo" → name="Pollo", sin añadir corte, peso ni presentación.
+- "LECHE ENTERA 1L  1,25" → quantity=1 L y detectedPrice=1.25 EUR.
+
 Usa sourceImageIndex empezando en 0 e itemIndex único empezando en 0.
 `.trim()
 

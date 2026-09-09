@@ -6,6 +6,7 @@ import {
   ImageInputError,
   prepareImageFiles,
 } from '../../../src/features/image-import/server/image-input.ts'
+import { normalizeAIAnalysis } from '../../../src/features/image-import/interpretation.ts'
 
 const corsHeaders = {
   'access-control-allow-origin': '*',
@@ -86,9 +87,11 @@ Deno.serve(async (request) => {
       apiKey: geminiApiKey,
       model: Deno.env.get('GEMINI_MODEL') ?? undefined,
     })
+    const products = normalizeAIAnalysis(analysis)
 
     return jsonResponse({
       analysis,
+      products,
       sources: images.map(({ sha256, byteLength, mimeType }, index) => ({
         index,
         sha256,
