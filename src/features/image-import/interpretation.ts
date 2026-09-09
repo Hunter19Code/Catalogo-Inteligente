@@ -4,6 +4,10 @@ import {
   type AIImageItem,
   type NormalizedDetectedProduct,
 } from './contracts'
+import {
+  resolveItemQuantity,
+  type QuantityResolution,
+} from './quantity'
 
 const STOP_WORDS = new Set(['de', 'del', 'la', 'el', 'los', 'las'])
 const NON_NAME_TOKENS = new Set([
@@ -125,6 +129,7 @@ function confidenceReasons(
   item: AIImageItem,
   evidenceScore: number,
   usedLiteralFallback: boolean,
+  quantity: QuantityResolution,
 ) {
   const reasons = new Set<
     NormalizedDetectedProduct['confidence']['reasons'][number]
@@ -153,6 +158,9 @@ function confidenceReasons(
   if (item.interpretation.uncertainties.includes('price_vs_quantity')) {
     reasons.add('price_quantity_conflict')
   }
+  if (quantity.conflict || quantity.priceConfusionPrevented) {
+    reasons.add('price_quantity_conflict')
+  }
   if (item.source.crossedOut === 'possible') {
     reasons.add('possible_crossed_out')
   }
@@ -177,6 +185,7 @@ function interpretationCeiling(item: AIImageItem) {
 function normalizeItem(
   item: AIImageItem,
   documentQuality: number,
+  documentKind: string,
 ): NormalizedDetectedProduct | null {
   if (item.interpretation.name === null) return null
 
@@ -189,6 +198,7 @@ function normalizeItem(
   const usedLiteralFallback =
     evidenceScore < 0.72 && literalFallback.length > 0
   const name = usedLiteralFallback ? literalFallback : proposedName
+  const quantity = resolveItemQuantity(item, documentKind)
 
   const textQuality = (item.source.legibility + documentQuality) / 2
   const interpretation = Math.min(
@@ -196,7 +206,8 @@ function normalizeItem(
     interpretationCeiling(item),
   )
   const uncertaintyPenalty = Math.min(
-    item.interpretation.uncertainties.length * 0.04,
+    item.interpretation.uncertainties.length * 0.04 +
+      (quantity.conflict ? 0.12 : 0),
     0.2,
   )
   const overall = Math.max(
@@ -216,6 +227,7 @@ function normalizeItem(
     !excluded &&
     (item.status === 'needs_review' ||
       usedLiteralFallback ||
+      quantity.conflict ||
       item.interpretation.interpretationKind === 'ambiguous' ||
       item.interpretation.uncertainties.length > 0 ||
       level !== 'high')
@@ -226,8 +238,8 @@ function normalizeItem(
     source: item.source,
     normalized: {
       name,
-      quantity: item.interpretation.quantity.value,
-      unit: item.interpretation.quantity.unit,
+      quantity: quantity.value,
+      unit: quantity.unit,
       categorySuggestionId: item.interpretation.categorySuggestionId,
     },
     match: {
@@ -246,6 +258,7 @@ function normalizeItem(
         item,
         evidenceScore,
         usedLiteralFallback,
+        quantity,
       ),
     },
     status: excluded ? 'excluded' : needsReview ? 'needs_review' : 'ready',
@@ -256,6 +269,12 @@ export function normalizeAIAnalysis(
   analysis: AIImageAnalysisResponse,
 ): NormalizedDetectedProduct[] {
   return analysis.items
-    .map((item) => normalizeItem(item, analysis.document.overallQuality))
+    .map((item) =>
+      normalizeItem(
+        item,
+        analysis.document.overallQuality,
+        analysis.document.kind,
+      ),
+    )
     .filter((item): item is NormalizedDetectedProduct => item !== null)
 }

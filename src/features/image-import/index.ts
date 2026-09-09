@@ -27,6 +27,15 @@ export {
   normalizeAIAnalysis,
   semanticEvidenceScore,
 } from './interpretation'
+export {
+  detectTrailingPrice,
+  extractQuantityAndUnit,
+  resolveItemQuantity,
+} from './quantity'
+export type {
+  ExtractedQuantity,
+  QuantityResolution,
+} from './quantity'
 export type {
   AIAnalysisValidationContext,
   ContractValidationIssue,
