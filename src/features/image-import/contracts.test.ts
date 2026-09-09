@@ -5,8 +5,9 @@ import {
   parseNormalizedDetectedProduct,
   parseReviewedShoppingListItem,
 } from './index'
+import type { AIImageAnalysisResponse } from './index'
 
-function validResponse() {
+function validResponse(): AIImageAnalysisResponse {
   return {
     schemaVersion: '1.0',
     document: {
